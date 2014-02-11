@@ -5,6 +5,8 @@ I created this project for an easier deployment of facebook's conceal.
 
 All credit goes to: https://github.com/facebook/conceal 
 
+Last commit: 2014-02-05
+
 Usage Maven Repo
 ----------------
 

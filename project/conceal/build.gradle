@@ -1,0 +1,85 @@
+apply plugin: 'android-library'
+apply plugin: 'maven'
+
+version = '1.0.0'
+group = 'com.facebook.crypto'
+
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.1"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+        versionCode 1
+        versionName version
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    release {
+        runProguard false
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+    }
+}
+
+
+
+afterEvaluate { project ->
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                def mavenRepositoryUrl
+                if (!project.hasProperty('mvnRepoUrl')) {
+                    println "Settings for mvnRepoUrl are missing/incomplete for ${project.name}"
+                    mavenRepositoryUrl = mavenLocal().getUrl()
+                } else {
+                    mavenRepositoryUrl = project.getProperties().get('mvnRepoUrl')
+                }
+
+//                mavenRepositoryUrl = mavenLocal().getUrl()
+
+                repository(url: mavenRepositoryUrl)
+
+                pom.project {
+                    name 'facebook Conceal'
+                    packaging 'aar'
+                    description 'Conceal provides a set of Java APIs to perform cryptography on Android. It was designed to be able to encrypt large files on disk in a fast and memory efficient manner.'
+                    url 'https://github.com/facebook/conceal'
+
+                    scm {
+                        url 'scm:git@github.com:facebook/conceal.git'
+                        connection 'scm:git@github.com:facebook/conceal.git'
+                        developerConnection 'scm:git@github.com:facebook/conceal.git'
+                    }
+                }
+            }
+        }
+    }
+
+    task androidJavadocs(type: Javadoc) {
+        source = android.sourceSets.main.allJava
+    }
+
+    task androidJavadocsJar(type: Jar) {
+        classifier = 'javadoc'
+        from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives androidSourcesJar
+        archives androidJavadocsJar
+    }
+}
